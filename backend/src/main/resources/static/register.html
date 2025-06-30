@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register as Blood Donor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --text: #f0f0f0;
+      --accent: #e63946;
+      --input-bg: #1c1c1c;
+      --border: #333;
+      --hover: #ff4f5e;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 30px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: var(--accent);
+      text-shadow: 0 0 6px rgba(255, 0, 0, 0.2);
+    }
+
+    form {
+      max-width: 400px;
+      margin: auto;
+      background-color: #1a1a1a;
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
+    }
+
+    input, select {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background-color: var(--input-bg);
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    select {
+      appearance: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--accent);
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    }
+
+    button:hover {
+      background-color: var(--hover);
+      transform: scale(1.03);
+      box-shadow: 0 0 18px rgba(255, 79, 94, 0.3);
+    }
+
+    #loc-status {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    #message {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 10px;
+      color: #ccc;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+
+      form {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🩸 Blood Donor Registration</h2>
+  <p id="loc-status">📍 Detecting location...</p>
+
+  <form id="donorForm">
+    <input type="text" id="name" placeholder="Full Name" required />
+
+    <select id="bloodGroup" required>
+      <option value="">Select Blood Group</option>
+      <option value="A+">A+</option>
+      <option value="A-">A-</option>
+      <option value="B+">B+</option>
+      <option value="B-">B-</option>
+      <option value="AB+">AB+</option>
+      <option value="AB-">AB-</option>
+      <option value="O+">O+</option>
+      <option value="O-">O-</option>
+    </select>
+
+    <input type="text" id="contact" placeholder="Contact Number" required />
+    <input type="text" id="address" placeholder="Address" required />
+	
+	<select id="state" required>
+	  <option value="">Select State</option>
+	</select>
+
+	<select id="city" required>
+	  <option value="">Select City</option>
+	</select>
+
+
+    <!-- Hidden auto-detected fields -->
+    <input type="hidden" id="lat">
+    <input type="hidden" id="lon">
+
+    <input type="password" id="password" placeholder="Password" required />
+    <button type="submit">Register</button>
+  </form>
+
+  <p id="message"></p>
+
+  <script>
+    const form = document.getElementById('donorForm');
+    const msg = document.getElementById('message');
+    const locStatus = document.getElementById('loc-status');
+
+    // Detect location on load
+    window.onload = function () {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            document.getElementById("lat").value = lat;
+            document.getElementById("lon").value = lon;
+
+            locStatus.textContent = "📍 Location detected! Fetching address...";
+
+			try {
+			  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+			  const data = await res.json();
+
+			  const address = data.display_name;
+			  const city = data.address.city || data.address.town || data.address.village || "";
+			  const state = data.address.state || "";
+
+			  if (address) document.getElementById("address").value = address;
+			  if (city) document.getElementById("city").value = city;
+			  if (state) document.getElementById("state").value = state;
+			  stateSelect.dispatchEvent(new Event('change')); // trigger city update
+			  citySelect.value = city;
+
+			  locStatus.textContent = `📍 Location autofilled: ${city}, ${state}`;
+			} catch (e) {
+			  locStatus.textContent = "❌ Location detected but address fetch failed.";
+			  console.error("Reverse geocoding failed:", e.message);
+			}
+
+          },
+          function (error) {
+            locStatus.textContent = "❌ Location not detected. You can still register.";
+            console.error("Geolocation failed:", error.message);
+          }
+        );
+      } else {
+        locStatus.textContent = "❌ Geolocation not supported.";
+      }
+    };
+
+	form.addEventListener('submit', async function (e) {
+	  e.preventDefault();
+	  msg.textContent = "🔄 Registering...";
+
+	  let lat = parseFloat(document.getElementById('lat').value);
+	  let lon = parseFloat(document.getElementById('lon').value);
+
+	  // If lat/lon are not already set (user denied location)
+	  if (!lat || !lon) {
+	    const state = document.getElementById('state').value;
+	    const city = document.getElementById('city').value;
+
+	    if (state && city) {
+	      const query = `${city}, ${state}`;
+
+	      try {
+	        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1`);
+	        const results = await res.json();
+
+	        if (results.length > 0) {
+	          const best = results[0];
+	          lat = parseFloat(best.lat);
+	          lon = parseFloat(best.lon);
+	          document.getElementById('lat').value = lat;
+	          document.getElementById('lon').value = lon;
+
+	          console.log("📍 Coordinates set from city + state:", city, state);
+	        } else {
+	          console.warn("No coordinates found for the selected city and state.");
+	        }
+	      } catch (err) {
+	        console.error("Forward geocoding failed:", err.message);
+	      }
+	    } else {
+	      console.warn("City or state is empty. Cannot geocode.");
+	    }
+	  }
+
+
+	  const donor = {
+	    name: document.getElementById('name').value,
+	    bloodGroup: document.getElementById('bloodGroup').value.toUpperCase(),
+	    contact: document.getElementById('contact').value,
+	    address: document.getElementById('address').value,
+	    city: document.getElementById('city').value,
+	    state: document.getElementById('state').value,  // ✅ Add this line
+	    latitude: lat || null,
+	    longitude: lon || null,
+	    password: document.getElementById('password').value
+	  };
+
+
+	  try {
+	    const response = await fetch('/api/donors/register', {
+	      method: 'POST',
+	      headers: { 'Content-Type': 'application/json' },
+	      body: JSON.stringify(donor)
+	    });
+
+	    if (response.ok) {
+	      msg.textContent = "✅ Donor registered successfully!";
+	      form.reset();
+	      alert("✅ Donor registered successfully!");
+	      window.location.href = "index.html";
+	    } else {
+	      msg.textContent = "❌ Registration failed. Please try again.";
+	    }
+	  } catch (error) {
+	    msg.textContent = "❌ Error: " + error.message;
+	  }
+	});
+	
+	const stateCityMap = {
+	  "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur"],
+	  "Arunachal Pradesh": ["Itanagar", "Tawang", "Ziro"],
+	  "Assam": ["Guwahati", "Silchar", "Dibrugarh"],
+	  "Bihar": ["Patna", "Gaya", "Muzaffarpur"],
+	  "Chhattisgarh": ["Raipur", "Bilaspur", "Durg"],
+	  "Goa": ["Panaji", "Margao", "Vasco da Gama"],
+	  "Gujarat": ["Ahmedabad", "Surat", "Vadodara"],
+	  "Haryana": ["Gurgaon", "Faridabad", "Panipat"],
+	  "Himachal Pradesh": ["Shimla", "Manali", "Dharamshala"],
+	  "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad"],
+	  "Karnataka": ["Bangalore", "Mysore", "Mangalore"],
+	  "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode"],
+	  "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior"],
+	  "Maharashtra": ["Mumbai", "Pune", "Nagpur"],
+	  "Manipur": ["Imphal", "Bishnupur", "Thoubal"],
+	  "Meghalaya": ["Shillong", "Tura", "Jowai"],
+	  "Mizoram": ["Aizawl", "Lunglei", "Champhai"],
+	  "Nagaland": ["Kohima", "Dimapur", "Mokokchung"],
+	  "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela"],
+	  "Punjab": ["Ludhiana", "Amritsar", "Jalandhar"],
+	  "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur"],
+	  "Sikkim": ["Gangtok", "Namchi", "Gyalshing"],
+	  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
+	  "Telangana": ["Hyderabad", "Warangal", "Nizamabad"],
+	  "Tripura": ["Agartala", "Udaipur", "Dharmanagar"],
+	  "Uttar Pradesh": ["Lucknow", "Kanpur", "Varanasi"],
+	  "Uttarakhand": ["Dehradun", "Haridwar", "Nainital"],
+	  "West Bengal": ["Kolkata", "Asansol", "Siliguri"],
+
+	  // Union Territories
+	  "Andaman and Nicobar Islands": ["Port Blair"],
+	  "Chandigarh": ["Chandigarh"],
+	  "Dadra and Nagar Haveli and Daman and Diu": ["Daman", "Silvassa"],
+	  "Delhi": ["New Delhi", "Dwarka", "Rohini"],
+	  "Jammu and Kashmir": ["Srinagar", "Jammu", "Anantnag"],
+	  "Ladakh": ["Leh", "Kargil"],
+	  "Lakshadweep": ["Kavaratti"],
+	  "Puducherry": ["Puducherry", "Karaikal", "Mahe"]
+	};
+
+
+	  const stateSelect = document.getElementById("state");
+	  const citySelect = document.getElementById("city");
+
+	  // Populate state dropdown
+	  for (const state in stateCityMap) {
+	    const option = document.createElement("option");
+	    option.value = state;
+	    option.textContent = state;
+	    stateSelect.appendChild(option);
+	  }
+
+	  // Update city dropdown based on selected state
+	  stateSelect.addEventListener("change", function () {
+	    const selectedState = this.value;
+	    citySelect.innerHTML = '<option value="">Select City</option>';
+
+	    if (selectedState && stateCityMap[selectedState]) {
+	      stateCityMap[selectedState].forEach(city => {
+	        const option = document.createElement("option");
+	        option.value = city;
+	        option.textContent = city;
+	        citySelect.appendChild(option);
+	      });
+	    }
+	  });
+
+  </script>
+</body>
+</html>

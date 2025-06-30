@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Donor Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0e0e0e;
+      --card: #1d1d1d;
+      --text: #f4f4f4;
+      --accent: #e63946;
+      --button: #ff4b5c;
+      --border: #333;
+      --hover: #ff626d;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      color: var(--accent);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .card {
+      background-color: var(--card);
+      padding: 25px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 450px;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 12px rgba(255, 0, 0, 0.1);
+      margin-bottom: 25px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: #ff4b5c;
+    }
+
+    .card p {
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+
+    .card strong {
+      color: #aaa;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 450px;
+    }
+
+    button, .btn-link {
+      background-color: var(--button);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    button:hover, .btn-link:hover {
+      background-color: var(--hover);
+      transform: scale(1.02);
+    }
+
+    @media (max-width: 500px) {
+      body {
+        padding: 15px;
+      }
+
+      .card, .btn-group {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>👋 Welcome, <span id="donorName"></span></h2>
+
+  <div class="card">
+    <h3>Your Donor Details</h3>
+    <p><strong>Blood Group:</strong> <span id="bloodGroup"></span></p>
+    <p><strong>Contact:</strong> <span id="contact"></span></p>
+    <p><strong>Address:</strong> <span id="address"></span></p>
+    <p><strong>City:</strong> <span id="city"></span></p>
+	<p><strong>State:</strong> <span id="state"></span></p>
+    <p><strong>Latitude:</strong> <span id="latitude"></span></p>
+    <p><strong>Longitude:</strong> <span id="longitude"></span></p>
+  </div>
+
+  <div class="btn-group">
+    <a href="edit-profile.html" class="btn-link">✏️ Edit My Profile</a>
+    <button onclick="deleteAccount()">🗑️ Delete My Account</button>
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
+
+  <script>
+    const donor = JSON.parse(localStorage.getItem("loggedInDonor"));
+
+    if (!donor) {
+      alert("You are not logged in!");
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("donorName").textContent = donor.name;
+      document.getElementById("bloodGroup").textContent = donor.bloodGroup;
+      document.getElementById("contact").textContent = donor.contact;
+      document.getElementById("address").textContent = donor.address;
+      document.getElementById("city").textContent = donor.city;
+	  document.getElementById("state").textContent = donor.state;
+      document.getElementById("latitude").textContent = donor.latitude || "Not set";
+      document.getElementById("longitude").textContent = donor.longitude || "Not set";
+    }
+
+    function deleteAccount() {
+      if (!donor || !donor.id) {
+        alert("Login required or donor ID missing.");
+        return;
+      }
+
+      if (!confirm("⚠️ Are you sure you want to delete your account? This cannot be undone.")) return;
+
+      fetch(`/api/donors/delete/${donor.id}`, {
+        method: "DELETE"
+      })
+      .then(response => {
+        if (response.ok) {
+          alert("✅ Account deleted successfully.");
+          localStorage.removeItem("loggedInDonor");
+          window.location.href = "index.html";
+        } else {
+          alert("❌ Failed to delete your account.");
+        }
+      })
+      .catch(error => {
+        alert("❌ Error: " + error.message);
+      });
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedInDonor");
+      alert("👋 You have been logged out.");
+      window.location.href = "index.html";
+    }
+  </script>
+
+</body>
+</html>

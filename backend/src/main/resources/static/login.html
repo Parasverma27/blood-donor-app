@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Donor Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --card: #1c1c1c;
+      --text: #f0f0f0;
+      --accent: #e63946;
+      --hover: #ff4f5e;
+      --border: #333;
+      --input-bg: #2a2a2a;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background-color: var(--card);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    input {
+      background-color: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+
+    button {
+      background-color: var(--accent);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: var(--hover);
+      transform: scale(1.02);
+    }
+
+    #msg {
+      margin-top: 15px;
+      color: #ff4f4f;
+      font-weight: bold;
+    }
+
+    @media (max-width: 500px) {
+      .login-box {
+        margin: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-box">
+    <h2>🔐 Donor Login</h2>
+    <input type="text" id="contact" placeholder="📱 Contact Number" required />
+    <input type="password" id="password" placeholder="🔑 Password" required />
+    <button onclick="login()">Login</button>
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    function login() {
+      const contact = document.getElementById('contact').value;
+      const password = document.getElementById('password').value;
+
+      fetch('/api/donors/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contact, password })
+      })
+      .then(response => {
+        if (response.ok) return response.json();
+        else throw new Error("Invalid login");
+      })
+      .then(data => {
+        localStorage.setItem("loggedInDonor", JSON.stringify(data));
+        window.location.href = "dashboard.html";
+      })
+      .catch(err => {
+        document.getElementById('msg').textContent = '❌ Login failed. Check your credentials.';
+      });
+    }
+  </script>
+
+</body>
+</html>

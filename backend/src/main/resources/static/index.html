@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BloodBridge - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --text: #f0f0f0;
+      --accent: #e63946;
+      --card-bg: #1e1e1e;
+      --hover-bg: #ff4f5e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      scroll-behavior: smooth;
+    }
+
+    nav {
+      background-color: #181818;
+      padding: 16px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    nav h1 {
+      color: var(--accent);
+      font-size: 24px;
+      margin: 0;
+      text-shadow: 0 0 5px rgba(230, 57, 70, 0.5);
+    }
+
+    nav a {
+      color: var(--text);
+      margin-left: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 85vh;
+      text-align: center;
+      background: linear-gradient(135deg, #1c1c1c, #0f0f0f);
+      padding: 20px;
+    }
+
+    .hero h2 {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: var(--text);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      color: #ccc;
+    }
+
+    .hero button {
+      margin: 10px;
+      padding: 14px 28px;
+      background-color: var(--accent);
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 10px rgba(230, 57, 70, 0.3);
+    }
+
+    .hero button:hover {
+      transform: scale(1.05);
+      background-color: var(--hover-bg);
+      box-shadow: 0 0 20px rgba(255, 79, 94, 0.5);
+    }
+
+    .section {
+      padding: 50px 20px;
+      max-width: 1000px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .section h2 {
+      font-size: 2rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.1);
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 25px;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.2);
+    }
+
+    footer {
+      background: #141414;
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    @media (max-width: 600px) {
+      .hero h2 {
+        font-size: 2rem;
+      }
+
+      .hero button {
+        width: 100%;
+        max-width: 250px;
+      }
+
+      nav {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      nav a {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <h1>🩸 BloodBridge</h1>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="search.html">Find Donors</a>
+      <a href="register.html">Become a Donor</a>
+      <a href="login.html">Login</a>
+    </div>
+  </nav>
+
+  <section class="hero" data-aos="zoom-in">
+    <h2>Your Blood Can Save Lives</h2>
+    <p>Join BloodBridge to connect donors with those in urgent need.</p>
+    <a href="register.html"><button>Become a Donor</button></a>
+    <a href="search.html"><button>Find Donors</button></a>
+  </section>
+
+  <section class="section" data-aos="fade-up">
+    <h2>📊 Live Donor Statistics</h2>
+    <div class="card">
+      <h3>Total Registered Donors</h3>
+      <p id="donor-count">Loading...</p>
+    </div>
+  </section>
+
+  <section class="section" data-aos="fade-up">
+    <h2>Why Donate Blood?</h2>
+    <div class="card">
+      <p>
+        Every 2 seconds, someone in need requires blood. Your donation can save up to 3 lives.
+        BloodBridge brings together donors and recipients using technology.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 BloodBridge | Made with ❤️ to save lives
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+
+    fetch('/api/donors')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('donor-count').textContent = data.length;
+      })
+      .catch(() => {
+        document.getElementById('donor-count').textContent = "Error loading data";
+      });
+  </script>
+</body>
+</html>

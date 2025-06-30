@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Donor Profile</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input { margin: 5px; padding: 8px; width: 300px; }
+    button { padding: 8px 12px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>My Profile</h2>
+<input type="text" id="contactSearch" placeholder="Enter Contact" />
+<button onclick="loadProfile()">Load Profile</button>
+
+<div id="formSection" style="display:none;">
+  <input id="id" type="hidden" />
+  <input id="name" placeholder="Name" />
+  <input id="city" placeholder="City" />
+  <input id="bloodGroup" placeholder="Blood Group" />
+  <input id="contact" placeholder="Contact" />
+  <input id="address" placeholder="Address" />
+  <input id="latitude" placeholder="Latitude" />
+  <input id="longitude" placeholder="Longitude" />
+  <input id="password" placeholder="Password" />
+  <br/>
+  <button onclick="updateProfile()">Update</button>
+</div>
+
+<p id="status"></p>
+
+<script>
+  function loadProfile() {
+    const contact = document.getElementById("contactSearch").value;
+
+    fetch(`/api/donors/contact/${contact}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Donor not found");
+        return res.json();
+      })
+      .then(data => {
+        document.getElementById("formSection").style.display = 'block';
+        document.getElementById("id").value = data.id;
+        document.getElementById("name").value = data.name;
+        document.getElementById("city").value = data.city;
+        document.getElementById("bloodGroup").value = data.bloodGroup;
+        document.getElementById("contact").value = data.contact;
+        document.getElementById("address").value = data.address;
+        document.getElementById("latitude").value = data.latitude || '';
+        document.getElementById("longitude").value = data.longitude || '';
+        document.getElementById("password").value = data.password;
+      })
+      .catch(err => {
+        document.getElementById("status").textContent = "❌ Donor not found.";
+      });
+  }
+
+  function updateProfile() {
+    const id = document.getElementById("id").value;
+    const donor = {
+      name: document.getElementById("name").value,
+      city: document.getElementById("city").value,
+      bloodGroup: document.getElementById("bloodGroup").value,
+      contact: document.getElementById("contact").value,
+      address: document.getElementById("address").value,
+      latitude: parseFloat(document.getElementById("latitude").value),
+      longitude: parseFloat(document.getElementById("longitude").value),
+      password: document.getElementById("password").value
+    };
+
+    fetch(`/api/donors/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(donor)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Update failed");
+      return res.json();
+    })
+    .then(() => {
+      document.getElementById("status").textContent = "✅ Profile updated!";
+    })
+    .catch(() => {
+      document.getElementById("status").textContent = "❌ Failed to update.";
+    });
+  }
+</script>
+
+</body>
+</html>
