@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/blood-donor-app/static/css/main.9be237f6.css",
+    "main.js": "/blood-donor-app/static/js/main.cbbcafea.js",
+    "index.html": "/blood-donor-app/index.html",
+    "main.9be237f6.css.map": "/blood-donor-app/static/css/main.9be237f6.css.map",
+    "main.cbbcafea.js.map": "/blood-donor-app/static/js/main.cbbcafea.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9be237f6.css",
+    "static/js/main.cbbcafea.js"
+  ]
+}
