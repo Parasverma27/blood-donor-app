@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './components/App';
-import projectRoute from './projectRoute';
+import ProjectRoute from './projectRoute';
+import { BrowserRouter } from "react-router-dom";
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 // console.log(React);
 // console.log(ReactDOM);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous"></link>
 
 
 
@@ -17,7 +18,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 // console.log(root);
 
 // root.render('Hemlo World');
-// var userName  = 'Prathmesh';
+// var userName  = 'paras';
 
 // const element = <h1>Hello, world! {userName}</h1>;
 
@@ -37,7 +38,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 
 root.render(
-
-   projectRoute
-
+  <BrowserRouter basename="/blood-donor-app">
+    <ProjectRoute />
+  </BrowserRouter>
 );
