@@ -29,5 +29,6 @@ jobs:
       - name: Deploy to GitHub Pages
         working-directory: ./frontend
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: npm run deploy
+
