@@ -61,6 +61,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({});
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
