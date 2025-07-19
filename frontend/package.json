@@ -19,6 +19,10 @@
     "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
+  "repository": {
+  "type": "git",
+  "url": "https://Parasverma27:${GITHUB_TOKEN}@github.com/Parasverma27/blood-donor-app.git"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
