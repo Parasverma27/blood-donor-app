@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './components/App';
-import ProjectRoute from './projectRoute';
-import { BrowserRouter } from "react-router-dom";
+import ProjectRoutes from './projectRoute';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -37,8 +36,4 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 
 
-root.render(
-  <BrowserRouter basename="/blood-donor-app">
-    <ProjectRoute />
-  </BrowserRouter>
-);
+root.render(<ProjectRoutes />);

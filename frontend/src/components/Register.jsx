@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const stateCityData = {
   "Andhra Pradesh": ["Visakhapatnam", "Vijayawada"],
@@ -144,16 +146,47 @@ const Register = () => {
   };
 
   return (
-    <div className="container" style={{ maxWidth: 500, padding: '30px 15px', backgroundColor: '#1a1a1a', borderRadius: '12px', boxShadow: '0 0 15px rgba(255,0,0,0.1)', color: '#f0f0f0' }}>
+
+    <>
+     <style>{`
+    .form-control::placeholder,
+    .form-select::placeholder {
+      color: white !important;
+      opacity: 1;
+    }
+
+    .form-select {
+      color: white !important;
+      background-color: #212529 !important;
+      border-color: #6c757d !important;
+
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14l-4.796-5.481c-.566-.648-.106-1.659.753-1.659h9.592c.86 0 1.319 1.01.753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+      padding-right: 2rem;
+    }
+
+    .form-select option {
+      background-color: #212529;
+      color: white;
+    }
+
+
+  `}</style>
+
+<div style={{ backgroundColor: '#0f0f0f', color: '#f0f0f0' }}>
+
+<div className="container " style={{ maxWidth: 500, padding: '30px 15px', backgroundColor: '#1a1a1a', borderRadius: '12px', boxShadow: '0 0 15px rgba(255,0,0,0.1)' }}>
       <h2 className="text-center mb-4" style={{ color: '#e63946', textShadow: '0 0 6px rgba(255,0,0,0.2)' }}>🩸 Blood Donor Registration</h2>
       <form onSubmit={handleSubmit}>
         {/* Input field */}
-        <div className="mb-3">
+        <div className="mb-3 ">
           <input type="text" className={`form-control bg-dark border-secondary text-light ${errors.name && 'is-invalid'}`} placeholder="Full Name" name="name" value={formData.name} onChange={handleChange} />
           {errors.name && <div className="invalid-feedback">{errors.name}</div>}
         </div>
 
-        <div className="mb-3">
+        <div className="mb-3 ">
           <select name="bloodGroup" className="form-select bg-dark border-secondary text-light" value={formData.bloodGroup} onChange={handleChange} required>
             <option value="">Select Blood Group</option>
             {bloodGroups.map(bg => <option key={bg} value={bg}>{bg}</option>)}
@@ -161,7 +194,7 @@ const Register = () => {
         </div>
 
         <div className="mb-3">
-          <input type="text" className={`form-control bg-dark border-secondary text-light ${errors.contact && 'is-invalid'}`} placeholder="Contact Number" name="contact" value={formData.contact} onChange={handleChange} />
+          <input type="text" className={`form-control bg-dark border-secondary text-light  ${errors.contact && 'is-invalid'}`} placeholder="Contact Number" name="contact" value={formData.contact} onChange={handleChange} />
           {errors.contact && <div className="invalid-feedback">{errors.contact}</div>}
         </div>
 
@@ -196,6 +229,11 @@ const Register = () => {
       {message && <div className="alert alert-success mt-3">{message}</div>}
       {error && <div className="alert alert-danger mt-3">{error}</div>}
     </div>
+
+</div>
+    
+    </>
+     
   );
 };
 

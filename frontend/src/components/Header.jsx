@@ -27,13 +27,18 @@ function Header() {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link fw-bold text-white ms-3" to="/add-donor">
+              <Link className="nav-link fw-bold text-white ms-3" to="/register">
                 Become a Donor
               </Link>
             </li>
              <li className="nav-item">
               <Link className="nav-link fw-bold text-white ms-3" to="/find-donor">
                 Find Donors
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link fw-bold text-white ms-3" to="/login">
+                Login
               </Link>
             </li>
           </ul>

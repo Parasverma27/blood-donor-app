@@ -4,7 +4,7 @@ const Home = () => {
   const [donorCount, setDonorCount] = useState('Loading...');
 
   useEffect(() => {
-    fetch('/api/donors')
+    fetch('http://localhost:8080/api/donors') // Adjust the URL to your API endpoint
       .then(res => res.json())
       .then(data => setDonorCount(data.length))
       .catch(() => setDonorCount('Error loading data'));
@@ -48,10 +48,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-dark text-center text-muted py-3">
-        &copy; 2025 BloodBridge | Made with ❤️ to save lives
-      </footer>
     </div>
   );
 };

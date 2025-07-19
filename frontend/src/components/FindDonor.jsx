@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 const stateCityMap = {
   "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur"],
@@ -51,74 +61,87 @@ const FindDonor = () => {
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
 
- useEffect(() => {
-  const leafletMap = L.map('map').setView([20.59, 78.96], 5);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap);
-  setMap(leafletMap);
+  useEffect(() => {
+    const leafletMap = L.map('map').setView([20.59, 78.96], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap);
+    setMap(leafletMap);
 
-  return () => {
-    leafletMap.remove(); // Cleanup on unmount
-  };
-    }, []);
+    return () => {
+      leafletMap.remove(); // Cleanup
+    };
+  }, []);
 
   const clearMarkers = () => {
-    markers.forEach(marker => map.removeLayer(marker));
+    markers.forEach(marker => map && map.removeLayer(marker));
     setMarkers([]);
   };
 
   const handleSearch = async () => {
     if (!state && !city && !bloodGroup) {
-      alert("Please select state, city, and blood group.");
+      alert("Please select at least one filter: state, city, or blood group.");
       return;
     }
 
+    if (!map) return;
+
     try {
-      const res = await fetch(`/api/donors/search?state=${state}&city=${city}&bloodGroup=${bloodGroup}`);
+      const res = await fetch(`http://localhost:8080/api/donors/search?state=${encodeURIComponent(state)}&city=${encodeURIComponent(city)}&bloodGroup=${encodeURIComponent(bloodGroup)}`);
       const data = await res.json();
       setDonors(data);
       clearMarkers();
 
-      if (data.length > 0) {
-        data.forEach(d => {
-          if (d.latitude && d.longitude) {
-            const marker = L.marker([d.latitude, d.longitude])
-              .addTo(map)
-              .bindPopup(`<b>${d.name}</b><br>${d.bloodGroup}<br>${d.contact}`);
-            setMarkers(prev => [...prev, marker]);
-            map.setView([d.latitude, d.longitude], 12);
-          }
-        });
+      const newMarkers = [];
+      data.forEach(d => {
+        if (d.latitude && d.longitude) {
+          const marker = L.marker([d.latitude, d.longitude])
+            .addTo(map)
+            .bindPopup(`<b>${d.name}</b><br>${d.bloodGroup}<br>${d.contact}`);
+          newMarkers.push(marker);
+        }
+      });
+
+      setMarkers(newMarkers);
+
+      if (data.length > 0 && data[0].latitude && data[0].longitude) {
+        map.setView([data[0].latitude, data[0].longitude], 12);
       }
+
     } catch (err) {
       alert("Error fetching donors.");
     }
   };
 
   const detectAndLoadNearby = () => {
+    if (!map) return;
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async position => {
         const { latitude, longitude } = position.coords;
         map.setView([latitude, longitude], 13);
+
         const userMarker = L.marker([latitude, longitude])
           .addTo(map)
           .bindPopup("📍 You are here")
           .openPopup();
+        clearMarkers();
         setMarkers([userMarker]);
 
         try {
-          const res = await fetch(`/api/donors/nearby?lat=${latitude}&lon=${longitude}&radiusKm=10`);
+          const res = await fetch(`http://localhost:8080/api/donors/nearby?lat=${latitude}&lon=${longitude}&radiusKm=10`);
           const data = await res.json();
           setDonors(data);
-          clearMarkers();
 
+          const newMarkers = [userMarker];
           data.forEach(donor => {
             if (donor.latitude && donor.longitude) {
               const marker = L.marker([donor.latitude, donor.longitude])
                 .addTo(map)
                 .bindPopup(`<b>${donor.name}</b><br>${donor.bloodGroup}<br>${donor.contact}`);
-              setMarkers(prev => [...prev, marker]);
+              newMarkers.push(marker);
             }
           });
+
+          setMarkers(newMarkers);
         } catch {
           alert("Failed to fetch nearby donors.");
         }
