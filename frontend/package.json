@@ -28,7 +28,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build -u 'Paras Verma <parasverma373@gmail.com>' --repo=https://x-access-token:${GITHUB_TOKEN}@github.com/Parasverma27/blood-donor-app.git",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
