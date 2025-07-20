@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   const [donorCount, setDonorCount] = useState('Loading...');
@@ -19,8 +20,8 @@ const Home = () => {
         <h2 className="display-4 mb-3">Your Blood Can Save Lives</h2>
         <p className="lead text-light mb-4">Join BloodBridge to connect donors with those in urgent need.</p>
         <div>
-          <a href="register.html" className="btn btn-danger me-3 px-4 py-2">Become a Donor</a>
-          <a href="search.html" className="btn btn-outline-light px-4 py-2">Find Donors</a>
+          <Link to="/register" className="btn btn-danger me-3 px-4 py-2">Become a Donor</Link>
+          <Link to="/find-donor" className="btn btn-outline-light px-4 py-2">Find Donors</Link>
         </div>
       </div>
 
