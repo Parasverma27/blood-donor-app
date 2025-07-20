@@ -42,8 +42,6 @@ const stateCityData = {
 
 const EditProfile = () => {
   const navigate = useNavigate();
-  const donor = JSON.parse(localStorage.getItem('loggedInDonor'));
-
   const [formData, setFormData] = useState({
     name: '',
     bloodGroup: '',
@@ -60,6 +58,7 @@ const EditProfile = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
+    const donor = JSON.parse(localStorage.getItem('loggedInDonor'));
     if (!donor) {
       alert('Please log in first.');
       navigate('/login');
@@ -80,7 +79,7 @@ const EditProfile = () => {
         setCities(stateCityData[donor.state]);
       }
     }
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -114,12 +113,18 @@ const EditProfile = () => {
     } catch (error) {
       console.error('Geolocation error:', error);
     }
-    return { latitude: donor.latitude, longitude: donor.longitude };
+
+    const donor = JSON.parse(localStorage.getItem('loggedInDonor'));
+    return {
+      latitude: donor?.latitude || '',
+      longitude: donor?.longitude || ''
+    };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const donor = JSON.parse(localStorage.getItem('loggedInDonor'));
     const coords = await getCoordinates(formData.state, formData.city);
 
     const updatedDonor = {
@@ -151,22 +156,11 @@ const EditProfile = () => {
       <form onSubmit={handleSubmit} style={styles.form}>
         <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required style={styles.input} />
 
-        <select
-          name="bloodGroup"
-          value={formData.bloodGroup}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        >
+        <select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} required style={styles.input}>
           <option value="">Select Blood Group</option>
-          <option value="A+">A+</option>
-          <option value="A-">A-</option>
-          <option value="B+">B+</option>
-          <option value="B-">B-</option>
-          <option value="AB+">AB+</option>
-          <option value="AB-">AB-</option>
-          <option value="O+">O+</option>
-          <option value="O-">O-</option>
+          {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => (
+            <option key={bg} value={bg}>{bg}</option>
+          ))}
         </select>
 
         <input name="contact" placeholder="Contact" value={formData.contact} onChange={handleChange} required style={styles.input} />
@@ -198,7 +192,7 @@ const EditProfile = () => {
           />
           <button
             type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
+            onClick={() => setShowPassword(prev => !prev)}
             style={{
               position: 'absolute',
               right: 10,
@@ -209,9 +203,7 @@ const EditProfile = () => {
               color: '#e63946',
               cursor: 'pointer',
               fontWeight: 'bold',
-              padding: 0,
-              fontSize: '14px',
-              userSelect: 'none'
+              fontSize: '14px'
             }}
           >
             {showPassword ? 'Hide' : 'Show'}
@@ -266,8 +258,7 @@ const styles = {
     border: 'none',
     borderRadius: 6,
     fontSize: 16,
-    cursor: 'pointer',
-    transition: 'background-color 0.2s ease, transform 0.2s ease'
+    cursor: 'pointer'
   }
 };
 
