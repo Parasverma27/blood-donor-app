@@ -198,7 +198,7 @@ const Register = () => {
             <div className="mb-3">
               <input type="text" className="form-control bg-dark border-secondary text-light" placeholder="Address" name="address" value={formData.address} onChange={handleChange} />
             </div>
-
+    
             <div className="mb-3">
               <select name="state" className="form-select bg-dark border-secondary text-light" value={formData.state} onChange={handleChange} required>
                 <option value="">Select State</option>

@@ -41,6 +41,11 @@ function Header() {
                 Login
               </Link>
             </li>
+            <li className="nav-item">
+              <Link className="nav-link fw-bold text-white ms-3" to="/request">
+                Request
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

@@ -6,6 +6,7 @@ import App from "./components/App";
 import Home from "./components/Home";
 import DonorDashboard from "./components/DonorDashboard";
 import EditProfile from "./components/EditProfile";
+import BloodRequestForm from "./components/BloodRequestForm";
 
 const ProjectRoutes = () => (
   <BrowserRouter basename="/blood-donor-app">
@@ -18,6 +19,7 @@ const ProjectRoutes = () => (
         <Route path="login" element={<Login />} />
         <Route path="dashboard" element={<DonorDashboard />} />
         <Route path="edit-profile" element={<EditProfile />} />
+        <Route path="request" element={<BloodRequestForm />} />
       </Route>
     </Routes>
   </BrowserRouter>
