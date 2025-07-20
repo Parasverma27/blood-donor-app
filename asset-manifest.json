@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/blood-donor-app/static/css/main.9be237f6.css",
-    "main.js": "/blood-donor-app/static/js/main.c0fc2871.js",
+    "main.js": "/blood-donor-app/static/js/main.dd4f9c52.js",
     "index.html": "/blood-donor-app/index.html",
     "main.9be237f6.css.map": "/blood-donor-app/static/css/main.9be237f6.css.map",
-    "main.c0fc2871.js.map": "/blood-donor-app/static/js/main.c0fc2871.js.map"
+    "main.dd4f9c52.js.map": "/blood-donor-app/static/js/main.dd4f9c52.js.map"
   },
   "entrypoints": [
     "static/css/main.9be237f6.css",
-    "static/js/main.c0fc2871.js"
+    "static/js/main.dd4f9c52.js"
   ]
 }
