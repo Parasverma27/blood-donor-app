@@ -1,69 +1,102 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const DonorDashboard = () => {
   const navigate = useNavigate();
   const donor = JSON.parse(localStorage.getItem('loggedInDonor'));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!donor) {
+      // Optionally replace alert with toast
       alert('You are not logged in!');
       navigate('/login');
     }
   }, [donor, navigate]);
 
   const deleteAccount = async () => {
-    if (!donor || !donor.id) {
+    if (!donor?.id) {
       alert('Login required or donor ID missing.');
       return;
     }
-
     if (!window.confirm('⚠️ Are you sure you want to delete your account? This cannot be undone.')) return;
 
+    setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/donors/delete/${donor.id}`, { method: 'DELETE' });
-
+      const response = await fetch(`http://localhost:8080/api/donors/delete/${donor.id}`, {
+        method: 'DELETE',
+      });
       if (response.ok) {
         alert('✅ Account deleted successfully.');
         localStorage.removeItem('loggedInDonor');
-        navigate('/Home');
+        navigate('/home');
       } else {
         alert('❌ Failed to delete your account.');
       }
     } catch (error) {
       alert('❌ Error: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = () => {
     localStorage.removeItem('loggedInDonor');
     alert('👋 You have been logged out.');
-    navigate('/Home');
+    navigate('/home');
   };
 
-  if (!donor) return null; // prevent rendering before redirect
+  if (!donor) return null;
 
   return (
     <div style={styles.body}>
       <h2 style={styles.heading}>
-        👋 Welcome, <span>{donor.name}</span>
+        👋 Welcome, <span>{donor.name || 'Donor'}</span>
       </h2>
 
       <div style={styles.card}>
-        <h3 style={styles.cardTitle}>Your Donor Details</h3>
-        <p><strong>Blood Group:</strong> {donor.bloodGroup}</p>
-        <p><strong>Contact:</strong> {donor.contact}</p>
-        <p><strong>Address:</strong> {donor.address}</p>
-        <p><strong>City:</strong> {donor.city}</p>
-        <p><strong>State:</strong> {donor.state}</p>
-        <p><strong>Latitude:</strong> {donor.latitude || 'Not set'}</p>
-        <p><strong>Longitude:</strong> {donor.longitude || 'Not set'}</p>
-      </div>
+  <h3 style={styles.cardTitle}>Your Donor Details</h3>
+  <p><strong>Name:</strong> {donor.name || 'N/A'}</p>
+  <p><strong>Blood Group:</strong> {donor.bloodGroup || 'N/A'}</p>
+  <p><strong>Contact:</strong> {donor.contact || 'N/A'}</p>
+  <p><strong>Email:</strong> {donor.email || 'N/A'}</p>
+  <p><strong>Address:</strong> {donor.address || 'N/A'}</p>
+  <p><strong>City:</strong> {donor.city || 'N/A'}</p>
+  <p><strong>State:</strong> {donor.state || 'N/A'}</p>
+  <p><strong>Latitude:</strong> {donor.latitude ?? 'Not set'}</p>
+  <p><strong>Longitude:</strong> {donor.longitude ?? 'Not set'}</p>
+  <p><strong>Available for Donation:</strong> {donor.available ? '✅ Yes' : '❌ No'}</p>
+  <p><strong>Badge Level:</strong> {donor.badgeLevel || 'None'}</p>
+  <p><strong>Donation Count:</strong> {donor.donationCount ?? 0}</p>
+  <p><strong>Last Donation Date:</strong> {donor.lastDonationDate || 'N/A'}</p>
+  <p><strong>Reputation Score:</strong> {donor.reputationScore ?? 0}</p>
+</div>
+
 
       <div style={styles.btnGroup}>
-        <button style={styles.button} onClick={() => navigate('/edit-profile')}>✏️ Edit My Profile</button>
-        <button style={styles.button} onClick={deleteAccount}>🗑️ Delete My Account</button>
-        <button style={styles.button} onClick={logout}>🚪 Logout</button>
+        <button
+          style={styles.button}
+          onClick={() => navigate('/edit-profile')}
+          disabled={loading}
+        >
+          ✏️ Edit My Profile
+        </button>
+
+        <button
+          style={{ ...styles.button, backgroundColor: '#d63939' }}
+          onClick={deleteAccount}
+          disabled={loading}
+        >
+          {loading ? 'Deleting...' : '🗑️ Delete My Account'}
+        </button>
+
+        <button
+          style={styles.button}
+          onClick={logout}
+          disabled={loading}
+        >
+          🚪 Logout
+        </button>
       </div>
     </div>
   );

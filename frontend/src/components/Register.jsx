@@ -47,12 +47,13 @@ const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
+    email: '',
     address: '',
     state: '',
     city: '',
     bloodGroup: '',
-    latitude: '',
-    longitude: '',
+    latitude: null,
+    longitude: null,
     password: '',
   });
 
@@ -62,42 +63,44 @@ const Register = () => {
 
   // Get location and reverse geocode once on mount
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        setFormData(prev => ({ ...prev, latitude, longitude }));
-        try {
-          const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
-          const city = res.data.address.city || res.data.address.town || res.data.address.village || '';
-          const state = res.data.address.state || '';
-          setFormData(prev => ({ ...prev, city, state }));
-        } catch {
-          console.warn("Reverse geocoding failed");
-        }
-      },
-      () => {
-        console.warn("Location permission denied");
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const latitude = pos.coords.latitude;
+      const longitude = pos.coords.longitude;
+      setFormData(prev => ({ ...prev, latitude, longitude }));
+      try {
+        const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+        const city = res.data.address.city || res.data.address.town || res.data.address.village || '';
+        const state = res.data.address.state || '';
+        setFormData(prev => ({ ...prev, city, state }));
+      } catch {
+        console.warn("Reverse geocoding failed");
       }
-    );
-  }, []);
+    },
+    () => {
+      console.warn("Location permission denied");
+    }
+  );
+}, []);
 
   // Fetch lat/lon from city & state if not already set
   useEffect(() => {
-    const { city, state, latitude, longitude } = formData;
+  const { city, state, latitude, longitude } = formData;
 
-    if (city && state) {
-      // Prevent infinite loop if lat/lon already set
-      if (latitude && longitude) return;
+  if (city && state) {
+    // Prevent infinite loop if lat/lon already set
+    if (latitude && longitude) return;
 
-      axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(`${city}, ${state}`)}`)
-        .then(response => {
-          if (response.data.length > 0) {
-            const { lat, lon } = response.data[0];
-            setFormData(prev => ({ ...prev, latitude: lat, longitude: lon }));
-          }
-        });
-    }
-  }, [formData]);
+    axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(`${city}, ${state}`)}`)
+      .then(response => {
+        if (response.data.length > 0) {
+          const lat = parseFloat(response.data[0].lat);
+          const lon = parseFloat(response.data[0].lon);
+          setFormData(prev => ({ ...prev, latitude: lat, longitude: lon }));
+        }
+      });
+  }
+}, [formData.state, formData.city]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -132,19 +135,34 @@ const Register = () => {
     }
 
     try {
-      await axios.post('http://localhost:8080/api/donors/register', formData);
-      setMessage('✅ Registered successfully!');
-      setFormData({
-        name: '',
-        contact: '',
-        address: '',
-        state: '',
-        city: '',
-        bloodGroup: '',
-        latitude: '',
-        longitude: '',
-        password: '',
-      });
+    const payload = {
+      name: formData.name,
+      contact: formData.contact,
+      email: formData.email,
+      address: formData.address,
+      state: formData.state,
+      city: formData.city,
+      bloodGroup: formData.bloodGroup,
+      latitude: formData.latitude ?? null,
+      longitude: formData.longitude ?? null,
+      password: formData.password,
+      // available: true // optional to send, backend sets this automatically
+    };
+
+    await axios.post('http://localhost:8080/api/donors/register', payload);
+    setMessage('✅ Registered successfully!');
+    setFormData({
+      name: '',
+      contact: '',
+      email: '',
+      address: '',
+      state: '',
+      city: '',
+      bloodGroup: '',
+      latitude: null,
+      longitude: null,
+      password: '',
+    });
     } catch (err) {
       setError(err.response?.data || 'Something went wrong');
     }
@@ -193,6 +211,18 @@ const Register = () => {
             <div className="mb-3">
               <input type="text" className={`form-control bg-dark border-secondary text-light ${errors.contact && 'is-invalid'}`} placeholder="Contact Number" name="contact" value={formData.contact} onChange={handleChange} />
               {errors.contact && <div className="invalid-feedback">{errors.contact}</div>}
+            </div>
+
+            <div className="mb-3">
+              <input
+                type="email"
+                className="form-control bg-dark border-secondary text-light"
+                placeholder="Email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
             </div>
 
             <div className="mb-3">

@@ -42,20 +42,22 @@ const stateCityData = {
 
 const EditProfile = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     bloodGroup: '',
     contact: '',
+    email: '',
     address: '',
     state: '',
     city: '',
-    password: '',
     latitude: '',
     longitude: ''
   });
   const [cities, setCities] = useState([]);
   const [msg, setMsg] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
 
   useEffect(() => {
     const donor = JSON.parse(localStorage.getItem('loggedInDonor'));
@@ -67,10 +69,10 @@ const EditProfile = () => {
         name: donor.name || '',
         bloodGroup: donor.bloodGroup || '',
         contact: donor.contact || '',
+        email: donor.email || '',
         address: donor.address || '',
         state: donor.state || '',
         city: donor.city || '',
-        password: donor.password || '',
         latitude: donor.latitude || '',
         longitude: donor.longitude || ''
       });
@@ -134,6 +136,10 @@ const EditProfile = () => {
       longitude: coords.longitude
     };
 
+    if (newPassword.trim()) {
+      updatedDonor.password = newPassword;
+    }
+
     const res = await fetch(`http://localhost:8080/api/donors/update/${donor.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -154,26 +160,77 @@ const EditProfile = () => {
     <div style={styles.wrapper}>
       <h2 style={styles.heading}>✏️ Edit My Profile</h2>
       <form onSubmit={handleSubmit} style={styles.form}>
-        <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required style={styles.input} />
+        <input
+          name="name"
+          placeholder="Name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        />
 
-        <select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} required style={styles.input}>
+        <select
+          name="bloodGroup"
+          value={formData.bloodGroup}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        >
           <option value="">Select Blood Group</option>
           {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => (
             <option key={bg} value={bg}>{bg}</option>
           ))}
         </select>
 
-        <input name="contact" placeholder="Contact" value={formData.contact} onChange={handleChange} required style={styles.input} />
-        <input name="address" placeholder="Address" value={formData.address} onChange={handleChange} required style={styles.input} />
+        <input
+          name="contact"
+          placeholder="Contact"
+          value={formData.contact}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        />
 
-        <select name="state" value={formData.state} onChange={handleChange} required style={styles.input}>
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        />
+
+
+        <input
+          name="address"
+          placeholder="Address"
+          value={formData.address}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        />
+
+        <select
+          name="state"
+          value={formData.state}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        >
           <option value="">Select State</option>
           {Object.keys(stateCityData).map((state) => (
             <option key={state} value={state}>{state}</option>
           ))}
         </select>
 
-        <select name="city" value={formData.city} onChange={handleChange} required style={styles.input}>
+        <select
+          name="city"
+          value={formData.city}
+          onChange={handleChange}
+          required
+          style={styles.input}
+        >
           <option value="">Select City</option>
           {cities.map((city) => (
             <option key={city} value={city}>{city}</option>
@@ -182,12 +239,11 @@ const EditProfile = () => {
 
         <div style={{ position: 'relative' }}>
           <input
-            name="password"
+            name="newPassword"
             type={showPassword ? 'text' : 'password'}
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
+            placeholder="New Password (leave blank to keep current)"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
             style={{ ...styles.input, paddingRight: '40px' }}
           />
           <button
