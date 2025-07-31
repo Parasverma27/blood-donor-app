@@ -85,13 +85,10 @@ const Register = () => {
 
   // Fetch lat/lon from city & state if not already set
   useEffect(() => {
-  const { city, state, latitude, longitude } = formData;
+  if (formData.city && formData.state) {
+    if (formData.latitude && formData.longitude) return;
 
-  if (city && state) {
-    // Prevent infinite loop if lat/lon already set
-    if (latitude && longitude) return;
-
-    axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(`${city}, ${state}`)}`)
+    axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(`${formData.city}, ${formData.state}`)}`)
       .then(response => {
         if (response.data.length > 0) {
           const lat = parseFloat(response.data[0].lat);
@@ -100,7 +97,8 @@ const Register = () => {
         }
       });
   }
-}, [formData.state, formData.city]);
+}, [formData.city, formData.state, formData.latitude, formData.longitude]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
