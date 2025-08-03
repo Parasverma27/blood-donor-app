@@ -158,163 +158,125 @@ const EditProfile = () => {
 
   return (
     <div style={styles.wrapper}>
-      <h2 style={styles.heading}>✏️ Edit My Profile</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          name="name"
-          placeholder="Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
+      <div style={styles.card}>
+        <h2 style={styles.heading}>✏️ Edit Profile</h2>
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.formGrid}>
+            <input name="name" placeholder="Name" value={formData.name} onChange={handleChange} required style={styles.input} />
+            <select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} required style={styles.input}>
+              <option value="">Blood Group</option>
+              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => (
+                <option key={bg} value={bg}>{bg}</option>
+              ))}
+            </select>
+            <input name="contact" placeholder="Contact" value={formData.contact} onChange={handleChange} required style={styles.input} />
+            <input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} required style={styles.input} />
+            <input name="address" placeholder="Address" value={formData.address} onChange={handleChange} required style={styles.input} />
+            <select name="state" value={formData.state} onChange={handleChange} required style={styles.input}>
+              <option value="">Select State</option>
+              {Object.keys(stateCityData).map(state => (
+                <option key={state} value={state}>{state}</option>
+              ))}
+            </select>
+            <select name="city" value={formData.city} onChange={handleChange} required style={styles.input}>
+              <option value="">Select City</option>
+              {cities.map(city => (
+                <option key={city} value={city}>{city}</option>
+              ))}
+            </select>
 
-        <select
-          name="bloodGroup"
-          value={formData.bloodGroup}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        >
-          <option value="">Select Blood Group</option>
-          {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => (
-            <option key={bg} value={bg}>{bg}</option>
-          ))}
-        </select>
+            <div style={{ position: 'relative', gridColumn: '1 / -1' }}>
+              <input
+                name="newPassword"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="New Password (leave blank to keep current)"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                style={{ ...styles.input, paddingRight: '60px', width: '100%' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(prev => !prev)}
+                style={styles.showBtn}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+          </div>
 
-        <input
-          name="contact"
-          placeholder="Contact"
-          value={formData.contact}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-
-
-        <input
-          name="address"
-          placeholder="Address"
-          value={formData.address}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        />
-
-        <select
-          name="state"
-          value={formData.state}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        >
-          <option value="">Select State</option>
-          {Object.keys(stateCityData).map((state) => (
-            <option key={state} value={state}>{state}</option>
-          ))}
-        </select>
-
-        <select
-          name="city"
-          value={formData.city}
-          onChange={handleChange}
-          required
-          style={styles.input}
-        >
-          <option value="">Select City</option>
-          {cities.map((city) => (
-            <option key={city} value={city}>{city}</option>
-          ))}
-        </select>
-
-        <div style={{ position: 'relative' }}>
-          <input
-            name="newPassword"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="New Password (leave blank to keep current)"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            style={{ ...styles.input, paddingRight: '40px' }}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(prev => !prev)}
-            style={{
-              position: 'absolute',
-              right: 10,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'none',
-              border: 'none',
-              color: '#e63946',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              fontSize: '14px'
-            }}
-          >
-            {showPassword ? 'Hide' : 'Show'}
-          </button>
-        </div>
-
-        <button type="submit" style={styles.button}>Update Profile</button>
-        {msg && <p id="msg" style={{ textAlign: 'center', marginTop: '10px' }}>{msg}</p>}
-      </form>
+          <button type="submit" style={styles.button}>💾 Save Changes</button>
+          {msg && <p style={{ marginTop: '10px', color: '#ff4b5c', textAlign: 'center' }}>{msg}</p>}
+        </form>
+      </div>
     </div>
   );
 };
 
 const styles = {
   wrapper: {
-    backgroundColor: '#0e0e0e',
-    color: '#f4f4f4',
+    backgroundColor: '#0f0f0f',
     minHeight: '100vh',
-    padding: '30px 20px',
+    padding: '40px 20px',
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    color: '#f4f4f4',
+    fontFamily: "'Segoe UI', sans-serif",
+  },
+  card: {
+    backgroundColor: '#1c1c1c',
+    padding: '30px',
+    borderRadius: '10px',
+    boxShadow: '0 0 20px rgba(255, 75, 92, 0.1)',
+    width: '100%',
+    maxWidth: '600px',
   },
   heading: {
-    color: '#e63946',
-    marginBottom: 20
+    fontSize: '1.8rem',
+    color: '#ffd166',
+    marginBottom: '25px',
+    textAlign: 'center'
   },
   form: {
-    backgroundColor: '#1d1d1d',
-    padding: 25,
-    borderRadius: 10,
-    boxShadow: '0 0 12px rgba(255,0,0,0.1)',
-    width: '100%',
-    maxWidth: 400,
     display: 'flex',
     flexDirection: 'column'
   },
+  formGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '15px'
+  },
   input: {
-    margin: '10px 0',
     padding: '12px',
-    border: '1px solid #444',
-    borderRadius: 6,
-    backgroundColor: '#2b2b2b',
+    borderRadius: '6px',
+    border: '1px solid #333',
+    backgroundColor: '#2a2a2a',
     color: '#f4f4f4',
-    fontSize: 16
+    fontSize: '1rem',
+    width: '100%',
+  },
+  showBtn: {
+    position: 'absolute',
+    right: '10px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    color: '#ffd166',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '0.9rem'
   },
   button: {
-    marginTop: 15,
-    padding: 12,
+    marginTop: '30px',
+    padding: '14px',
+    fontSize: '1rem',
     backgroundColor: '#ff4b5c',
-    color: 'white',
+    color: '#fff',
     border: 'none',
-    borderRadius: 6,
-    fontSize: 16,
-    cursor: 'pointer'
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
   }
 };
 

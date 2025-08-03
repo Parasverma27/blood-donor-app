@@ -87,6 +87,15 @@ const FindDonor = () => {
     try {
       const res = await fetch(`http://localhost:8080/api/donors/search?state=${encodeURIComponent(state)}&city=${encodeURIComponent(city)}&bloodGroup=${encodeURIComponent(bloodGroup)}`);
       const data = await res.json();
+
+      if (data.length === 0) {
+        alert("No Donors found");
+        setDonors([]);
+        clearMarkers();
+        return;
+      }
+
+
       setDonors(data);
       clearMarkers();
 
@@ -129,6 +138,15 @@ const FindDonor = () => {
         try {
           const res = await fetch(`http://localhost:8080/api/donors/nearby?lat=${latitude}&lon=${longitude}&radiusKm=10`);
           const data = await res.json();
+
+          if (data.length === 0) {
+            alert("No Donors found");
+            setDonors([]);         
+            clearMarkers();       
+            return;               
+          }
+
+
           setDonors(data);
 
           const newMarkers = [userMarker];
@@ -188,6 +206,7 @@ const FindDonor = () => {
           <div key={idx} className="bg-secondary bg-opacity-10 border border-secondary p-3 rounded mb-2">
             <strong>{d.name}</strong> ({d.bloodGroup})<br />
             📞 {d.contact} <br />
+            📧 {d.email} <br />
             📍 {d.address}, {d.city}, {d.state}
           </div>
         ))}

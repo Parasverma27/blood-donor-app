@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const stateCityData =  {
+const stateCityData = {
   "Andhra Pradesh": ["Visakhapatnam", "Vijayawada"],
   "Arunachal Pradesh": ["Itanagar", "Naharlagun"],
   "Assam": ["Guwahati", "Dibrugarh"],
@@ -73,12 +73,7 @@ const BloodRequestForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { latitude, longitude } = await getCoordinates(formData.state, formData.city);
-
-    const requestData = {
-      ...formData,
-      latitude,
-      longitude
-    };
+    const requestData = { ...formData, latitude, longitude };
 
     try {
       const response = await fetch('http://localhost:8080/api/requests/create', {
@@ -86,7 +81,6 @@ const BloodRequestForm = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestData)
       });
-
       const result = await response.text();
       setMessage(response.ok ? `✅ ${result}` : `❌ Error: ${result}`);
     } catch (error) {
@@ -96,128 +90,129 @@ const BloodRequestForm = () => {
   };
 
   return (
-<>
-
-<style>{`
-        .form-control::placeholder,
-        .form-select::placeholder {
-          color: white !important;
-          opacity: 1;
+    <>
+      <style>{`
+        .form-control::placeholder, .form-select::placeholder {
+          color: #ccc !important;
         }
         .form-select {
-          color: white !important;
-          background-color: #212529 !important;
-          border-color: #6c757d !important;
-          background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='white' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14l-4.796-5.481c-.566-.648-.106-1.659.753-1.659h9.592c.86 0 1.319 1.01.753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 0.75rem center;
-          background-size: 1rem;
-          padding-right: 2rem;
+          background-color: #1e1e1e !important;
+          color: #fff !important;
+          border-color: #444;
         }
         .form-select option {
-          background-color: #212529;
-          color: white;
+          background-color: #1e1e1e;
+          color: #fff;
+        }
+        .dashboard-card {
+          background-color: #1a1a1a;
+          border-radius: 12px;
+          box-shadow: 0 0 20px rgba(255, 75, 92, 0.1);
+          padding: 25px;
+        }
+        .dashboard-title {
+          color: #e63946;
+          text-align: center;
+          margin-bottom: 25px;
+          font-weight: 600;
+        }
+        .btn-danger {
+          background-color: #ff4b5c;
+          border: none;
+        }
+        .btn-danger:hover {
+          background-color: #e63946;
         }
       `}</style>
 
+      <div style={{ backgroundColor: '#0f0f0f', minHeight: '100vh', padding: '40px 0', color: '#f4f4f4' }}>
+        <div className="container">
+          <div className="dashboard-card mx-auto" style={{ maxWidth: 600 }}>
+            <h3 className="dashboard-title">🩸 Request Blood</h3>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label>Your Name</label>
+                <input
+                  name="requesterName"
+                  className="form-control bg-dark text-light border-secondary"
+                  placeholder="Enter your name"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-<div style={{ backgroundColor: '#0f0f0f', color: '#f0f0f0' }}>
+              <div className="mb-3">
+                <label>Blood Group</label>
+                <select
+                  name="bloodGroup"
+                  className="form-select"
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Blood Group</option>
+                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => (
+                    <option key={bg} value={bg}>{bg}</option>
+                  ))}
+                </select>
+              </div>
 
-     <div className="container mt-0" style={{ maxWidth: 500, padding: '30px 15px', backgroundColor: '#1a1a1a', borderRadius: '12px', boxShadow: '0 0 15px rgba(255,0,0,0.1)' }}>
-      <div className="card bg-dark text-light shadow-lg">
-        <div className="card-header">
-          <h3 className="mb-4 text-center"  style={{ color: '#e63946', textShadow: '0 0 6px rgba(255,0,0,0.2)' }}>🩸 Request Blood</h3>
-        </div>
-        <div className="card-body">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label>Your Name</label>
-              <input
-                name="requesterName"
-                className="form-control bg-dark border-secondary text-light"
-                placeholder="Enter your name"
-                onChange={handleChange}
-                required
-              />
-            </div>
+              <div className="mb-3">
+                <label>Contact Info</label>
+                <input
+                  name="contact"
+                  className="form-control bg-dark text-light border-secondary"
+                  placeholder="Phone or email"
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-            <div className="mb-3">
-              <label>Blood Group</label>
-              <select
-                name="bloodGroup"
-                className="form-select bg-dark border-secondary text-light"
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Blood Group</option>
-                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => (
-                  <option key={bg} value={bg}>{bg}</option>
-                ))}
-              </select>
-            </div>
+              <div className="mb-3">
+                <label>State</label>
+                <select
+                  name="state"
+                  className="form-select"
+                  value={formData.state}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select State</option>
+                  {Object.keys(stateCityData).map(state => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="mb-3">
-              <label>Contact </label>
-              <input
-                name="contact"
-                className="form-control bg-dark border-secondary text-light"
-                placeholder="phone or email"
-                onChange={handleChange}
-                required
-              />
-            </div>
+              <div className="mb-3">
+                <label>City</label>
+                <select
+                  name="city"
+                  className="form-select"
+                  value={formData.city}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select City</option>
+                  {(stateCityData[formData.state] || []).map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="mb-3">
-              <label>State</label>
-              <select
-                name="state"
-                className="form-select bg-dark border-secondary text-light"
-                value={formData.state}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select State</option>
-                {Object.keys(stateCityData).map(state => (
-                  <option key={state} value={state}>{state}</option>
-                ))}
-              </select>
-            </div>
+              <button type="submit" className="btn btn-danger w-100">
+                🚨 Submit Blood Request
+              </button>
+            </form>
 
-            <div className="mb-3">
-              <label>City</label>
-              <select
-                name="city"
-                className="form-select bg-dark border-secondary text-light"
-                value={formData.city}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select City</option>
-                {(stateCityData[formData.state] || []).map(city => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
-            </div>
-
-            <button type="submit" className="btn btn-danger w-100">
-              🚨 Submit Blood Request
-            </button>
-          </form>
-
-          {message && (
-            <div className="alert mt-4 alert-info text-center">
-              {message}
-            </div>
-          )}
+            {message && (
+              <div className="alert alert-info text-center mt-4">
+                {message}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-
-</div>
-
-</>
-
-    
+    </>
   );
 };
 
